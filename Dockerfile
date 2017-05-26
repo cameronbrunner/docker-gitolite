@@ -16,8 +16,9 @@ ENV ADMIN_USER="admin" \
 
 RUN sed -e "s/Listen 80.*/Listen 8080/" -i /etc/httpd/conf/httpd.conf && \
     for dir in ${HOME}/.ssh ${HOME} /var/log/httpd /run/httpd; do \
-      mkdir -v -p ${dir} && chmod -cR g+rwX ${dir} && chgrp -cR 0 ${dir} ; \
+      mkdir -v -p ${dir} && chmod -cR g+rwX ${dir} && chgrp -cR ${USER} ${dir} ; \
     done && \
+    chgrp -c ${USER} /etc/gitweb.conf && \
     chmod g+rw /etc/gitweb.conf
 
 COPY passwd.in /usr/share/gitolite3/passwd.in
@@ -35,6 +36,7 @@ RUN mkfifo -m 666 /var/log/httpd/access_log \
 #RUN ln -sf /dev/stdout /var/log/httpd/access.log \
 #    && ln -sf /dev/stderr /var/log/httpd/error.log
 
+VOLUME ${HOME}
 USER ${USER}
 WORKDIR ${HOME}
 
